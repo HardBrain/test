@@ -8,9 +8,12 @@ jobs:
   create-tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: sergeysova/jq-action@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
+      - run: apt install -y jq
+      - run: git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - run: git config user.name "$GITHUB_ACTOR"
       - run: VERSION=$(curl --header "Authorization:Bearer ${{ secrets.ACCESS_TOKEN }}" \
                       "https://api.github.com/repos/HardBrain/test/tags" | jq -r '. | if length == 0 then "1.0" else .[0] | .name | split(".") as $version | $version[1] | tonumber + 1 | tostring | "\($version[0]).\(.)" end')
       - run: git tag "v${VERSION}"
