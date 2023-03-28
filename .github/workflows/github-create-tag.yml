@@ -18,11 +18,10 @@ jobs:
       - run: git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - run: git config user.name "$GITHUB_ACTOR"
       - run: |
-          SISI=$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json' --url 'https://api.github.com/repos/${{ github.repository }}/tags' | jq -r '. | if length == 0 then "1.0" else "FULL" end')
+          curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json' --url 'https://api.github.com/repos/HardBrain/test/tags' | jq -r '. | if length == 0 then "1.0" else .[0] | .name | split(".") as $version | $version[1] | tonumber + 1 | tostring | "\($version[0]).\(.)" end'
       - run: |
           VERSION=$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json' --url 'https://api.github.com/repos/HardBrain/test/tags' | jq -r '. | if length == 0 then "1.0" else .[0] | .name | split(".") as $version | $version[1] | tonumber + 1 | tostring | "\($version[0]).\(.)" end')
       - run: echo $VERSION
-      - run: echo $SISI
       - run: git tag "v${VERSION}"
       - run: git push origin --tags
       - run: git push origin --follow-tags
