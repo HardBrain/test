@@ -10,9 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt install -y jq
-      - run: jq --version
-      - run: git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      - run: git config user.name "$GITHUB_ACTOR"
       - run: |
           git tag "v$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json' --url 'https://api.github.com/repos/${{ github.repository }}/tags' | jq -r '. | if length == 0 then "1.0" else .[0] | .name | split(".") as $version | $version[1] | tonumber + 1 | tostring | "\($version[0]).\(.)" end')"
       - run: git push origin --tags
