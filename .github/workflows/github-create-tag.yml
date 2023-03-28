@@ -1,22 +1,21 @@
-name: Create tag and release
+name: Create tag
 
 on:
   push:
     branch: "main"
 
 jobs:
-  create-tag-and-release:
+  create-tag:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt install -y jq
       - run: |
           VERSION=$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json' --url 'https://api.github.com/repos/${{ github.repository }}/tags' | jq -r '. | if length == 0 then "v1.0" else .[0] | .name | split(".") as $version | $version[1] | tonumber + 1 | tostring | "\($version[0]).\(.)" end')
-          echo $VERSION
-          curl -L -X POST \
-            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --url "https://api.github.com/repos/${{ github.repository }}/tags?tag_name=${VERSION}&ref=main"
+          git tag "${VERSION}"
+          git push origin --tags
+          git push origin --follow-tags
           curl -L -X POST \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
             --url 'https://api.github.com/repos/${{ github.repository }}/releases' \
-            -d "{"tag_name":"${VERSION}","target_commitish":"main","name":"Release for ${VERSION}","body":"Release ${VERSION}","draft":false,"prerelease":false,"generate_release_notes":false}"
+            --data "name=release&tag_name=${VERSION}&description=release"
