@@ -5,7 +5,7 @@ on:
     branch: "main"
 
 jobs:
-  create-tag:
+  create-tag-and-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,8 +15,8 @@ jobs:
           echo $VERSION
           curl -L -X POST \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --url 'https://api.github.com/repos/${{ github.repository }}/tags?tag_name=$VERSION&ref=main'
+            --url "https://api.github.com/repos/${{ github.repository }}/tags?tag_name=${VERSION}&ref=main"
           curl -L -X POST \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
             --url 'https://api.github.com/repos/${{ github.repository }}/releases' \
-            -d '{"tag_name":"$VERSION","target_commitish":"main","name":"Release for $VERSION","body":"Release $VERSION","draft":false,"prerelease":false,"generate_release_notes":false}'
+            -d "{"tag_name":"${VERSION}","target_commitish":"main","name":"Release for ${VERSION}","body":"Release ${VERSION}","draft":false,"prerelease":false,"generate_release_notes":false}"
