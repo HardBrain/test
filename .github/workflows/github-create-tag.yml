@@ -7,6 +7,7 @@ on:
 jobs:
   create-tag:
     runs-on: ubuntu-latest
+    permissions: read-all|write-all
     steps:
       - uses: actions/checkout@v3
         with:
@@ -16,7 +17,8 @@ jobs:
       - run: sudo apt install -y jq
       - run: git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - run: git config user.name "$GITHUB_ACTOR"
-      - run: curl -L --header "Authorization:Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/HardBrain/test/tags"
+      - run: curl -L --header "Authorization:Bearer ${GITHUB_TOKEN}" \
+             --url https://api.github.com/repos/${{ github.repository }}/test/tags
       - run: VERSION=$(curl -L --header "Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}" \
                       "https://api.github.com/repos/HardBrain/test/tags" | jq -r '. | if length == 0 then "1.0" else .[0] | .name | split(".") as $version | $version[1] | tonumber + 1 | tostring | "\($version[0]).\(.)" end')
       - run: echo $VERSION
