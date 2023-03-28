@@ -18,4 +18,4 @@ jobs:
           curl -L -X POST \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
             --url 'https://api.github.com/repos/${{ github.repository }}/releases' \
-            --data "{"tag_name":"${VERSION}","target_commitish":"master","name":"${VERSION}","body":"Description of the release","draft":false,"prerelease":false,"generate_release_notes":false}"
+            --data "{\"tag_name\":\""${VERSION}"\",\"target_commitish\":\"main\",\"name\":\""${VERSION}"\",\"body\":\"Description of the release\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
